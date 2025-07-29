@@ -367,18 +367,33 @@ function afficherEquipe(team) {
   }
 
   function sendTicket(index) {
-    const viewer = viewers[index];
-    // Message SANS obligation d'adresse si non fournie
-    let message = `🎫 Bonjour ${viewer.name}, vous êtes bien inscrit(e) au show du tournoi !%0A`;
-    message += `Montant payé: $${viewer.amount}%0A`;
-    if (viewer.address) {
-      message += `Adresse: ${viewer.address}%0A`;
-    }
-    message += `Téléphone: +${viewer.whatsapp}`;
+  const viewer = viewers[index];
 
-    const whatsappURL = `https://wa.me/+${viewer.whatsapp}?text=${message}`;
-    window.open(whatsappURL, "_blank");
+  // 1) Nettoyer le numéro: garder uniquement les chiffres
+  //    Ex.: " +243 812-345-678 " -> "243812345678"
+  const phone = String(viewer.whatsapp).replace(/\D/g, '');
+
+  // 2) Construire le message avec \n (plus lisible),
+  //    puis l'encoder avec encodeURIComponent
+  let message = `🎫 Bonjour ${viewer.name}, vous êtes bien inscrit(e) au show du tournoi !\n`;
+  message += `Montant payé: $${viewer.amount}\n`;
+  if (viewer.address) {
+    message += `Adresse: ${viewer.address}\n`;
   }
+  message += `Téléphone: +${phone}`;
+
+  const encoded = encodeURIComponent(message);
+
+  // 3) Construire l’URL wa.me SANS signe +
+  const whatsappURL = `https://wa.me/${phone}?text=${encoded}`;
+
+  // Optionnel: fallback pour desktop si besoin
+  // const whatsappURL = `https://api.whatsapp.com/send?phone=${phone}&text=${encoded}`;
+  // ou encore: `https://web.whatsapp.com/send?phone=${phone}&text=${encoded}`
+
+  window.open(whatsappURL, "_blank");
+}
+
 
   function deleteViewer(index) {
     if (confirm("❗ Voulez-vous vraiment supprimer ce spectateur ?")) {
