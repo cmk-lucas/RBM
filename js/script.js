@@ -368,8 +368,15 @@ function afficherEquipe(team) {
 
   function sendTicket(index) {
     const viewer = viewers[index];
-    const message = `🎫 Bonjour ${viewer.name}, vous êtes bien inscrit !\nAdresse: ${viewer.address}\nTéléphone: ${viewer.whatsapp}`;
-    const whatsappURL = `https://wa.me/${viewer.whatsapp}?text=${encodeURIComponent(message)}`;
+    // Message SANS obligation d'adresse si non fournie
+    let message = `🎫 Bonjour ${viewer.name}, vous êtes bien inscrit(e) au show du tournoi !%0A`;
+    message += `Montant payé: $${viewer.amount}%0A`;
+    if (viewer.address) {
+      message += `Adresse: ${viewer.address}%0A`;
+    }
+    message += `Téléphone: +${viewer.whatsapp}`;
+
+    const whatsappURL = `https://wa.me/+${viewer.whatsapp}?text=${message}`;
     window.open(whatsappURL, "_blank");
   }
 
